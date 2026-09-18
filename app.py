@@ -9,32 +9,44 @@ API_SECRET = os.getenv('DELTA_API_SECRET')
 BASE_URL = "https://cdn-ind.testnet.deltaex.org"
 client = DeltaRestClient(base_url=BASE_URL, api_key=API_KEY, api_secret=API_SECRET)
 
+def get_btc_product():
+    # Seedha BTCUSD maang
+    try:
+        r = requests.get(f"{BASE_URL}/v2/products/BTCUSD", timeout=10).json()
+        if r.get('success'):
+            return r['result']
+    except: pass
+    # Fallback - symbols filter se
+    try:
+        r = requests.get(f"{BASE_URL}/v2/products?contract_types=perpetual_futures", timeout=10).json()
+        for p in r['result']:
+            if p['symbol'] == 'BTCUSD':
+                return p
+    except: pass
+    return None
+
 @app.route('/')
 def home():
-    r = requests.get(f"{BASE_URL}/v2/products?contract_types=perpetual_futures").json()
-    syms = [p['symbol'] for p in r['result'][:5]]
-    return f"BOT LIVE - Perps: {syms}"
+    p = get_btc_product()
+    if p:
+        return f"BOT LIVE - Found {p['symbol']} ID {p['id']} Price {p.get('spot_price')}"
+    return "BOT LIVE but BTCUSD not found"
 
 @app.route('/buy')
 def buy():
-    r = requests.get(f"{BASE_URL}/v2/products?contract_types=perpetual_futures").json()
-    btc = None
-    for p in r['result']:
-        if p['symbol'] == 'BTCUSD':
-            btc = p
-            break
-    
+    btc = get_btc_product()
     if not btc:
-        return "BTCUSD Future nahi mila"
-    
+        return "FAIL: BTCUSD Future nahi mila API se"
+
     pid = btc['id']
     try:
         client.set_leverage(pid, 20)
-    except: pass
+    except Exception as e:
+        pass
 
     try:
         order = client.place_order(product_id=pid, size=10, side='buy', order_type=OrderType.MARKET)
-        return f"SUCCESS: BTCUSD LONG 10 Lots 20x Lag Gaya! {order}"
+        return f"SUCCESS LONG ✅ BTCUSD 10 Lot 20x Lag Gaya!<br>Order: {order}"
     except Exception as e:
         return f"ORDER FAIL: {e}"
 
