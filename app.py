@@ -2,7 +2,7 @@ import os
 import threading
 import requests
 from flask import Flask
-from delta_rest_client import DeltaRestClient
+from delta_rest_client import DeltaRestClient, OrderType
 
 app = Flask(__name__)
 
@@ -41,11 +41,11 @@ def buy_long():
     try:
         delta_client.set_leverage(pid, LEVERAGE)
     except: pass
-    
+
     try:
-        # FIX: direct string use, no OrderType enum
-        delta_client.place_order(product_id=pid, size=LOT_SIZE, side='buy', order_type='market_order')
-        send_telegram(f"LONG Placed! ✅\nSymbol: {SYMBOL_TO_TRADE}\nLots: {LOT_SIZE}\nLeverage: {LEVERAGE}x @ Market Price")
+        # SAHI FIX - OrderType.MARKET (MARKET_ORDER nahi)
+        delta_client.place_order(product_id=pid, size=LOT_SIZE, side='buy', order_type=OrderType.MARKET)
+        send_telegram(f"LONG Placed! ✅\nSymbol: {SYMBOL_TO_TRADE}\nLots: {LOT_SIZE}\nLeverage: {LEVERAGE}x @ Market")
     except Exception as e:
         send_telegram(f"Buy Failed: {e}")
 
@@ -62,16 +62,6 @@ def home():
 def start_algo_route():
     threading.Thread(target=buy_long).start()
     return f"LONG {LOT_SIZE} Lots {LEVERAGE}x Placing! Telegram Dekh"
-
-@app.route('/sell')
-def sell_route():
-    pid = get_product_id(SYMBOL_TO_TRADE)
-    try:
-        delta_client.place_order(product_id=pid, size=LOT_SIZE, side='sell', order_type='market_order')
-        send_telegram(f"Closed: {SYMBOL_TO_TRADE} SELL {LOT_SIZE}")
-        return "Sell Placed"
-    except Exception as e:
-        return f"Sell Failed: {e}"
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0', port=10000)
