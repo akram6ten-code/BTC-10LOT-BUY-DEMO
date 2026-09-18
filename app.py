@@ -6,27 +6,27 @@ app = Flask(__name__)
 
 API_KEY = os.environ.get("DELTA_API_KEY")
 API_SECRET = os.environ.get("DELTA_API_SECRET")
-BASE_URL = "https://testnet-api.delta.exchange"
+BASE_URL = "https://cdn-ind.testnet.deltaex.org"
 
 client = DeltaRestClient(base_url=BASE_URL, api_key=API_KEY, api_secret=API_SECRET)
 
 @app.route('/')
 def home():
-    return "BOT LIVE"
+    return "BOT LIVE - DEMO FIXED"
 
 @app.route('/check')
 def check():
     try:
         bal = client.get_balances()
-        return f"KEY SAHI HAI: {bal}"
+        return f"KEY OK: {bal}"
     except Exception as e:
-        return f"KEY GALAT: {e}"
+        return f"KEY FAIL: {e}"
 
 @app.route('/buy')
 def buy():
     try:
         order = client.place_order(product_id=84, size=10, side='buy', order_type=OrderType.MARKET)
-        return f"BUY HO GAYA: {order}"
+        return f"BUY DONE: {order}"
     except Exception as e:
         return f"ERROR: {e}"
 
