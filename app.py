@@ -3,8 +3,8 @@ from delta_rest_client import DeltaRestClient, OrderType
 
 app = Flask(__name__)
 
-API_KEY = "bWnbXhQp0Bw2sK8rV9jT4mZ1nY3"
-API_SECRET = "gH7fK9pL2qR5tW8xY0zA3cD6eJ1iU4oM2bN5vB8cX0kZ3jL6"
+DELTA_API_KEY = "KCdIJwHwIFkcVFLynabxJ0kkL1gLZ5"
+DELTA_API_SECRET = "NEHJCYK5fihJpCeaJh7X6xQgxn7jYpGmWpzrAOj15F9vRcQa2yAqtYFYw47I"
 BASE_URL = "https://testnet-api.delta.exchange"
 
 client = DeltaRestClient(base_url=BASE_URL, api_key=API_KEY, api_secret=API_SECRET)
