@@ -1,3 +1,4 @@
+
 from flask import Flask
 from delta_rest_client import DeltaRestClient, OrderType
 app = Flask(__name__)
@@ -21,3 +22,4 @@ def buy():
         return f"ERROR {e}"
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=10000)
+    
