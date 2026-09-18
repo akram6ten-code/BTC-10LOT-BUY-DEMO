@@ -1,3 +1,2 @@
-Flask
-delta-rest-client
 requests
+flask
